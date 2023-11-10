@@ -35,13 +35,6 @@ class BinanceData(BaseFinancialMarketsGenerator):
         if type(interval) == int:
             interval = self.tf[interval]
 
-        if start is None:
-            # minute, minutes, hours, days, weeks
-            start = str(int(datetime.now().timestamp() * 1000) - 60000 * 60 * 24 * 7 * 2)
-            # start = str(int(datetime.now().timestamp() * 1000) - 60000 * 1250)
-        if end is None:
-            end = str(int(datetime.now().timestamp() * 1000))
-
         if symbol != "BTCUSDT":
             symbol = self.symbols[symbol]
 

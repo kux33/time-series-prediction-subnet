@@ -1,7 +1,7 @@
 # developer: Taoshidev
 # Copyright © 2023 Taoshi, LLC
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Tuple
 
 
@@ -29,7 +29,7 @@ class TimeUtil:
 
     @staticmethod
     def generate_start_timestamp(days: int) -> datetime:
-        return datetime.utcnow() - timedelta(days=days)
+        return datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=days)
 
     @staticmethod
     def convert_range_timestamps_to_millis(timestamps: List[Tuple[datetime, datetime]]) -> List[Tuple[int, int]]:
@@ -41,23 +41,19 @@ class TimeUtil:
 
     @staticmethod
     def timestamp_to_millis(dt) -> int:
-        return int(dt.timestamp() * 1000) + 0
+        return int(dt.timestamp() * 1000)
 
     @staticmethod
     def seconds_to_timestamp(seconds: int) -> datetime:
-        return datetime.fromtimestamp(seconds)
+        return datetime.utcfromtimestamp(seconds)
 
     @staticmethod
     def millis_to_timestamp(millis: int) -> datetime:
-        return datetime.fromtimestamp(millis / 1000.0)
+        return datetime.utcfromtimestamp(millis / 1000.0)
 
     @staticmethod
     def minute_in_millis(minutes: int) -> int:
         return minutes * 60000
-
-    @staticmethod
-    def convert_millis_to_timestamp(millis: int) -> datetime:
-        return datetime.fromtimestamp(millis / 1000)
 
     @staticmethod
     def hours_in_millis(hours: int = 24) -> int:

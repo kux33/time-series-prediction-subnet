@@ -134,41 +134,6 @@ if __name__ == "__main__":
                 "close_in_features": True,
                 "predict_close_only": False
             },
-            "../mining_models/model501.h5": {
-                "window_size": 12,
-                "id": 501,
-                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
-                "close_in_features": False,
-                "predict_close_only": True
-            },
-            "../mining_models/model502.h5": {
-                "window_size": 12,
-                "id": 502,
-                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
-                "close_in_features": False,
-                "predict_close_only": True
-            },
-            "../mining_models/model503.h5": {
-                "window_size": 12,
-                "id": 503,
-                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
-                "close_in_features": False,
-                "predict_close_only": True
-            },
-            "../mining_models/model504.h5": {
-                "window_size": 12,
-                "id": 504,
-                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
-                "close_in_features": False,
-                "predict_close_only": True
-            },
-            "../mining_models/model505.h5": {
-                "window_size": 12,
-                "id": 505,
-                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
-                "close_in_features": False,
-                "predict_close_only": True
-            },
         }
 
         for model_name, mining_details in mining_models.items():
@@ -194,7 +159,7 @@ if __name__ == "__main__":
             else:
                 for i in range(client_request.prediction_size):
                     predictions = base_mining_model.predict(prep_dataset_cp, )[0]
-                    prep_dataset_cp = np.concatenate((prep_dataset, predictions), axis=0)
+                    prep_dataset_cp = np.concatenate((prep_dataset_cp, predictions), axis=0)
                     predicted_closes.append(predictions.tolist()[0][0])
 
             print(len(predicted_closes))
@@ -202,6 +167,14 @@ if __name__ == "__main__":
             output_uuid = str(uuid.uuid4())
             miner_uuid = "miner" + str(mining_details["id"])
             # just the vali hotkey for now
+
+            print("initial dt", end_dt)
+
+            print(TimeUtil.timestamp_to_millis(end_dt))
+            print(TimeUtil.timestamp_to_millis(end_dt) + ts)
+
+            test = TimeUtil.timestamp_to_millis(end_dt)
+            print("back again", TimeUtil.millis_to_timestamp(test))
 
             pdf = PredictionDataFile(
                 client_uuid=client_request.client_uuid,
@@ -279,11 +252,19 @@ if __name__ == "__main__":
             request_df = request_details.df
             data_structure = ValiUtils.get_standardized_ds()
             data_generator_handler = DataGeneratorHandler()
+
+            print("request df start", TimeUtil.millis_to_timestamp(request_df.start))
+            print("request df end", TimeUtil.millis_to_timestamp(request_df.end))
+
             data_generator_handler.data_generator_handler(request_df.topic_id,
                                                           request_df.prediction_size,
                                                           request_df.additional_details,
                                                           data_structure,
                                                           (request_df.start, request_df.end))
+
+            print("ended start", TimeUtil.millis_to_timestamp(data_structure[0][0]))
+            print("ended end", TimeUtil.millis_to_timestamp(data_structure[0][len(data_structure[0]) - 1]))
+
             scores = {}
             for miner_uid, miner_preds in request_details.predictions.items():
                 scores[miner_uid] = Scoring.score_response(miner_preds, data_structure[1])
