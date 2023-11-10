@@ -38,10 +38,10 @@ if __name__ == "__main__":
 
     # choose the range of days to look back
     # number of days back start
-    days_back_start = 10
+    days_back_start = 5
     # number of days forward since end day
     # for example start from 10 days ago and get 2 days from 10 days ago (10 days ago, 9 days ago, 8 days ago)
-    days_back_end = 2
+    days_back_end = 4
 
     ts_ranges = TimeUtil.convert_range_timestamps_to_millis(
         TimeUtil.generate_range_timestamps(

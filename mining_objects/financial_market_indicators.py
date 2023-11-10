@@ -39,35 +39,57 @@ class FinancialMarketIndicators:
         return rsi_values
 
     @staticmethod
-    def calculate_macd(ds: List[List[float]],
-                       short_period=12,
-                       long_period=26,
-                       signal_period=9):
-        df = pd.DataFrame({'Close': ds[0]})
+    def calculate_macd(ds: List[List[float]], short_period=12, long_period=26, signal_period=9):
+        ds = ds[0]
 
-        df['ShortEMA'] = df['Close'].ewm(span=short_period, adjust=False).mean()
-        df['LongEMA'] = df['Close'].ewm(span=long_period, adjust=False).mean()
+        short_ema = []
+        long_ema = []
+        macd_line = []
+        signal_line = []
 
-        df['MACD'] = df['ShortEMA'] - df['LongEMA']
+        for i in range(len(ds)):
+            if i < long_period - 1:
+                short_ema.append(None)
+                long_ema.append(None)
+                macd_line.append(None)
+                signal_line.append(None)
+            else:
+                short_ema.append(sum(ds[i - short_period + 1:i + 1]) / short_period)
+                long_ema.append(sum(ds[i - long_period + 1:i + 1]) / long_period)
+                macd_line.append(short_ema[i] - long_ema[i])
 
-        df['Signal'] = df['MACD'].ewm(span=signal_period, adjust=False).mean()
+                if i >= long_period + signal_period - 1:
+                    signal_line.append(sum(macd_line[i - signal_period + 1:i + 1]) / signal_period)
+                else:
+                    signal_line.append(None)
 
-        return df['MACD'].tolist(), df['Signal'].tolist()
+        return macd_line, signal_line
 
     @staticmethod
     def calculate_bollinger_bands(ds: List[List[float]],
                                   window=20,
                                   num_std_dev=2):
-        df = pd.DataFrame({'Close': ds[0]})
+        ds = ds[0]
 
-        df['Middle'] = df['Close'].rolling(window=window).mean()
+        middle_band = []
+        upper_band = []
+        lower_band = []
 
-        rolling_std = df['Close'].rolling(window=window).std()
+        for i in range(len(ds)):
+            if i < window - 1:
+                middle_band.append(None)
+                upper_band.append(None)
+                lower_band.append(None)
+            else:
+                window_data = ds[i - window + 1:i + 1]
+                middle = sum(window_data) / window
+                std_dev = (sum((x - middle) ** 2 for x in window_data) / window) ** 0.5
 
-        df['Upper'] = df['Middle'] + (num_std_dev * rolling_std)
-        df['Lower'] = df['Middle'] - (num_std_dev * rolling_std)
+                middle_band.append(middle)
+                upper_band.append(middle + num_std_dev * std_dev)
+                lower_band.append(middle - num_std_dev * std_dev)
 
-        return df['Middle'].tolist(), df['Upper'].tolist(), df['Lower'].tolist()
+        return middle_band, upper_band, lower_band
 
     @staticmethod
     def calculate_ema(ds: List[List[float]], length = 9):

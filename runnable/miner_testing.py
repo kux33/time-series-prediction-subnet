@@ -130,26 +130,74 @@ if __name__ == "__main__":
             "../mining_models/base_model.h5": {
                 "window_size": 12,
                 "id": 1,
-                "mining_model": BaseMiningModel.base_model_dataset(samples)
-            }
+                "mining_model": BaseMiningModel.base_model_dataset(samples),
+                "close_in_features": True,
+                "predict_close_only": False
+            },
+            "../mining_models/model501.h5": {
+                "window_size": 12,
+                "id": 501,
+                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
+                "close_in_features": False,
+                "predict_close_only": True
+            },
+            "../mining_models/model502.h5": {
+                "window_size": 12,
+                "id": 502,
+                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
+                "close_in_features": False,
+                "predict_close_only": True
+            },
+            "../mining_models/model503.h5": {
+                "window_size": 12,
+                "id": 503,
+                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
+                "close_in_features": False,
+                "predict_close_only": True
+            },
+            "../mining_models/model504.h5": {
+                "window_size": 12,
+                "id": 504,
+                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
+                "close_in_features": False,
+                "predict_close_only": True
+            },
+            "../mining_models/model505.h5": {
+                "window_size": 12,
+                "id": 505,
+                "mining_model": BaseMiningModel.base_model_additional_dataset(samples),
+                "close_in_features": False,
+                "predict_close_only": True
+            },
         }
 
         for model_name, mining_details in mining_models.items():
             prep_dataset = mining_details["mining_model"]
-            base_mining_model = BaseMiningModel(len(prep_dataset.T))\
-                .set_window_size(mining_details["window_size"])\
-                .set_model_dir(model_name)\
+            base_mining_model = BaseMiningModel(len(prep_dataset.T)) \
+                .set_window_size(mining_details["window_size"]) \
+                .set_model_dir(model_name) \
                 .load_model()
 
-            prep_dataset_cp = prep_dataset[:]
+            prep_dataset_cp = prep_dataset[1:]
 
             predicted_closes = []
-            for i in range(client_request.prediction_size):
-                predictions = base_mining_model.predict(prep_dataset_cp,)[0]
-                prep_dataset_cp = np.concatenate((prep_dataset, predictions), axis=0)
-                predicted_closes.append(predictions.tolist()[0][0])
+            if mining_details["close_in_features"] is False:
+                base_mining_model.features = base_mining_model.features - 1
+            if mining_details["predict_close_only"]:
+                predicted_closes = base_mining_model.predict_close_only(prep_dataset_cp, )[0].tolist()[0][
+                                   :client_request.prediction_size]
+            elif mining_details["close_in_features"] is False:
+                for i in range(client_request.prediction_size):
+                    predictions = base_mining_model.predict_close_only(prep_dataset_cp, )[0]
+                    prep_dataset_cp = np.concatenate((prep_dataset, predictions), axis=0)
+                    predicted_closes.append(predictions.tolist()[0][0])
+            else:
+                for i in range(client_request.prediction_size):
+                    predictions = base_mining_model.predict(prep_dataset_cp, )[0]
+                    prep_dataset_cp = np.concatenate((prep_dataset, predictions), axis=0)
+                    predicted_closes.append(predictions.tolist()[0][0])
 
-            print(predicted_closes)
+            print(len(predicted_closes))
 
             output_uuid = str(uuid.uuid4())
             miner_uuid = "miner" + str(mining_details["id"])
@@ -244,10 +292,10 @@ if __name__ == "__main__":
             stream_id = updated_vm.get_client(request_df.client_uuid).get_stream(request_df.stream_id)
 
             sorted_scores = sorted(scaled_scores.items(), key=lambda x: x[1], reverse=True)
-            winning_scores = sorted_scores[:10]
+            winning_scores = sorted_scores[:100]
 
             weighed_scores = Scoring.weigh_miner_scores(winning_scores)
-            weighed_winning_scores = weighed_scores[:10]
+            weighed_winning_scores = weighed_scores[:100]
             weighed_winning_scores_dict = {score[0]:score[1] for score in weighed_winning_scores}
 
             print("winning distribution", weighed_winning_scores)
