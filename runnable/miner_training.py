@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     for i in range(1, 20):
         # if you want the data to start from a certain location
-        curr_iter = 300000
+        curr_iter = 250000
         while True:
             try:
                 # if you want to use the local historical btc data file
