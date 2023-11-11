@@ -19,7 +19,7 @@ class TimeUtil:
             end_timestamp = current_date.replace(hour=23, minute=59, second=59, microsecond=999999)
             if end_timestamp > end_date:
                 end_timestamp = end_date
-            timestamps.append((start_timestamp, end_timestamp))
+            timestamps.append((start_timestamp.replace(tzinfo=timezone.utc), end_timestamp.replace(tzinfo=timezone.utc)))
             current_date += timedelta(days=1)
 
         if print_timestamps:
@@ -45,11 +45,11 @@ class TimeUtil:
 
     @staticmethod
     def seconds_to_timestamp(seconds: int) -> datetime:
-        return datetime.utcfromtimestamp(seconds)
+        return datetime.utcfromtimestamp(seconds).replace(tzinfo=timezone.utc)
 
     @staticmethod
     def millis_to_timestamp(millis: int) -> datetime:
-        return datetime.utcfromtimestamp(millis / 1000.0)
+        return datetime.utcfromtimestamp(millis / 1000).replace(tzinfo=timezone.utc)
 
     @staticmethod
     def minute_in_millis(minutes: int) -> int:

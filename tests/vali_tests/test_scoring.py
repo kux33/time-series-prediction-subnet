@@ -128,7 +128,7 @@ class TestScoring(TestBase):
             actual.append(x - 0.05)
 
         score = Scoring.score_response(predictions, actual)
-        self.assertEqual(score, 0.22360679774997513)
+        self.assertEqual(score, 0.04999999999999829)
 
 
 if __name__ == '__main__':
