@@ -150,6 +150,8 @@ class BaseMiningModel:
         macd4, signal4 = FinancialMarketIndicators.calculate_macd(samples.tolist(), 86, 208, 30)
         macd5, signal5 = FinancialMarketIndicators.calculate_macd(samples.tolist(), 172, 416, 30)
         macd6, signal6 = FinancialMarketIndicators.calculate_macd(samples.tolist(), 244, 824, 30)
+        middle7, signal7 = FinancialMarketIndicators.calculate_macd(samples.tolist(), 12, 26, 9)
+        middle8, signal8 = FinancialMarketIndicators.calculate_macd(samples.tolist(), 6, 13, 9)
 
         middle, upper, lower = FinancialMarketIndicators.calculate_bollinger_bands(samples.tolist())
         middle2, upper2, lower2 = FinancialMarketIndicators.calculate_bollinger_bands(samples.tolist(), window=64)
@@ -157,6 +159,7 @@ class BaseMiningModel:
         middle4, upper4, lower4 = FinancialMarketIndicators.calculate_bollinger_bands(samples.tolist(), window=256)
         middle5, upper5, lower5 = FinancialMarketIndicators.calculate_bollinger_bands(samples.tolist(), window=512)
         middle6, upper6, lower6 = FinancialMarketIndicators.calculate_bollinger_bands(samples.tolist(), window=1024)
+        middle7, upper7, lower7 = FinancialMarketIndicators.calculate_bollinger_bands(samples.tolist(), window=10)
 
         min_cutoff = 0
 
@@ -192,6 +195,8 @@ class BaseMiningModel:
         vmin_signal, vmax_signal, cutoff_signal4 = Scaling.scale_values(signal4[min_cutoff:])
         vmin_signal, vmax_signal, cutoff_signal5 = Scaling.scale_values(signal5[min_cutoff:])
         vmin_signal, vmax_signal, cutoff_signal6 = Scaling.scale_values(signal6[min_cutoff:])
+        vmin_signal, vmax_signal, cutoff_signal7 = Scaling.scale_values(signal7[min_cutoff:])
+        vmin_signal, vmax_signal, cutoff_signal8 = Scaling.scale_values(signal8[min_cutoff:])
 
         vmin_bb, vmax_bb, cutoff_middle = Scaling.scale_values(middle[min_cutoff:])
         vmin_bb, vmax_bb, cutoff_lower = Scaling.scale_values(lower[min_cutoff:])
@@ -217,6 +222,10 @@ class BaseMiningModel:
         vmin_bb, vmax_bb, cutoff_lower6 = Scaling.scale_values(lower6[min_cutoff:])
         vmin_bb, vmax_bb, cutoff_upper6 = Scaling.scale_values(upper6[min_cutoff:])
 
+        vmin_bb, vmax_bb, cutoff_middle7 = Scaling.scale_values(middle7[min_cutoff:])
+        vmin_bb, vmax_bb, cutoff_lower7 = Scaling.scale_values(lower7[min_cutoff:])
+        vmin_bb, vmax_bb, cutoff_upper7 = Scaling.scale_values(upper7[min_cutoff:])
+
         vmin_rsi, vmax_rsi, cutoff_rsi = Scaling.scale_values(rsi[min_cutoff:])
 
         cutoff_close = samples.tolist()[0][min_cutoff:]
@@ -233,6 +242,8 @@ class BaseMiningModel:
                          cutoff_signal4,
                          cutoff_signal5,
                          cutoff_signal6,
+                         cutoff_signal7,
+                         cutoff_signal8,
                          cutoff_rsi,
                          cutoff_middle,
                          cutoff_lower,
@@ -252,4 +263,7 @@ class BaseMiningModel:
                          cutoff_middle6,
                          cutoff_lower6,
                          cutoff_upper6,
+                         cutoff_middle7,
+                         cutoff_lower7,
+                         cutoff_upper7
                          ]).T
