@@ -82,7 +82,6 @@ class BaseMiningModel:
 
         predicted_value = self.loaded_model.predict(window_data)
         predictions.append(predicted_value)
-
         return predictions
 
     @staticmethod
